@@ -47,7 +47,7 @@ Antes de rodar o comando de ```docker-compose up``` garanta que as portas necess
 1. **Clone o repositório**
 ```bash
 git clone <url-do-repositorio>
-cd teddy
+cd encurta
 ```
 
 3. **Execute com Docker Compose**
