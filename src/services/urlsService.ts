@@ -39,7 +39,7 @@ export class UrlsServices {
 
   public async listUrlsByUserIdService(user_id: string) {
     const urls = await this.urlsRepository.listUrls(user_id)
-    if (!urls) {
+    if (urls.length === 0) {
       throw new UrlsNotFound()
     }
     return urls.map(({ id, url, alias, counter }) => ({

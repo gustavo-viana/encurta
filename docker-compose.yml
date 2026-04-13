@@ -11,16 +11,16 @@ services:
       POSTGRES_DB: appdb
     volumes:
       - ./db:/var/lib/postgresql/data
-  apiteddy:
-    build:
-      context: .
-    env_file:
-      - ./.env.build
-    container_name: encurtaLinks
-    ports:
-      - "3333:3333"
-    restart: unless-stopped
-    depends_on:
-      - postgres
+  # apiteddy:
+  #   build:
+  #     context: .
+  #   env_file:
+  #     - ./.env.build
+  #   container_name: encurtaLinks
+  #   ports:
+  #     - "3333:3333"
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - postgres
 
 volumes: {}
