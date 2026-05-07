@@ -19,7 +19,6 @@ export async function createUrlsController(
   try {
     const urlsRespository = makeUrlsService()
     if (user_id) {
-      console.error(request.user?.sub)
       const newUrl = await urlsRespository.shortenUrlsService(
         urlToShorten,
         user_id,

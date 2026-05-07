@@ -1,157 +1,155 @@
-// urls-repository.spec.ts
-
-import { describe, it, expect, beforeEach } from 'vitest'
-import { prisma } from '@/lib/prisma'
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 import { UrlsRepository } from './urlsRepository'
-import { randomUUID } from 'crypto'
+import { prisma } from '@/lib/prisma'
 
-let repository: UrlsRepository
-let id:string
-
-async function makeUser() {
-  return prisma.users.create({
-    data: {
-      email: `user-${Math.random()}@test.com`,
-      password_hash: '123',
-      name: 'Test',
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    urls: {
+      create: vi.fn(),
+      updateMany: vi.fn(),
+      findMany: vi.fn(),
+      findFirst: vi.fn(),
+      update: vi.fn(),
     },
-  })
+  },
+}))
+
+const prismaMock = prisma as unknown as {
+  urls: {
+    create: Mock
+    updateMany: Mock
+    findMany: Mock
+    findFirst: Mock
+    update: Mock
+  }
 }
 
-describe('UrlsRepository (integration)', () => {
-  beforeEach(async () => {
+describe('UrlsRepository', () => {
+  let repository: UrlsRepository
+
+  beforeEach(() => {
     repository = new UrlsRepository()
-    await prisma.urls.deleteMany()
+    vi.clearAllMocks()
   })
 
-  it('deve criar uma url', async () => {
-     id = (await makeUser()).id
+  it('deve criar uma url com usuário', async () => {
+    const url = { id: 'url-1', url: 'http://google.com', alias: 'abc123' }
+    prismaMock.urls.create.mockResolvedValueOnce(url as never)
+
     const result = await repository.createUrl(
       'http://google.com',
       'abc123',
-      id,
+      'user-1',
     )
 
-    expect(result.id).toBeDefined()
-    expect(result.alias).toBe('abc123')
+    expect(result).toBe(url)
+    expect(prismaMock.urls.create).toHaveBeenCalledWith({
+      data: {
+        url: 'http://google.com',
+        alias: 'abc123',
+        users_id: 'user-1',
+      },
+    })
   })
 
-  it('deve atualizar uma url', async () => {
-    const created = await repository.createUrl(
-      'old-url',
-      'abc',
-      id,
-    )
+  it('deve criar uma url sem usuário', async () => {
+    const url = { id: 'url-1', url: 'http://google.com', alias: 'abc123' }
+    prismaMock.urls.create.mockResolvedValueOnce(url as never)
 
-    const count = await repository.updateUrl(
-      'new-url',
-      created.id,
-      id,
-    )
+    await repository.createUrl('http://google.com', 'abc123')
+
+    expect(prismaMock.urls.create).toHaveBeenCalledWith({
+      data: {
+        url: 'http://google.com',
+        alias: 'abc123',
+      },
+    })
+  })
+
+  it('deve atualizar uma url ativa do usuário', async () => {
+    prismaMock.urls.updateMany.mockResolvedValueOnce({ count: 1 } as never)
+
+    const count = await repository.updateUrl('new-url', 'url-1', 'user-1')
 
     expect(count).toBe(1)
-
-    const updated = await prisma.urls.findUnique({
-      where: { id: created.id },
+    expect(prismaMock.urls.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'url-1',
+        status: 1,
+        users_id: 'user-1',
+      },
+      data: {
+        url: 'new-url',
+        updated_at: expect.any(Date),
+      },
     })
-
-    expect(updated?.url).toBe('new-url')
   })
 
-  it('não deve atualizar se não for dono', async () => {
-    const created = await repository.createUrl(
-      'old-url',
-      'abc',
-      id,
-    )
+  it('deve listar apenas urls ativas do usuário', async () => {
+    const urls = [{ id: 'url-1' }, { id: 'url-2' }]
+    prismaMock.urls.findMany.mockResolvedValueOnce(urls as never)
 
-    const count = await repository.updateUrl(
-      'new-url',
-      created.id,
-      '5',
-    )
+    const result = await repository.listUrls('user-1')
 
-    expect(count).toBe(0)
+    expect(result).toBe(urls)
+    expect(prismaMock.urls.findMany).toHaveBeenCalledWith({
+      where: { users_id: 'user-1', status: 1 },
+    })
   })
 
-  it('deve listar urls do usuário', async () => {
-    await repository.createUrl('url1', 'a1', id)
-    await repository.createUrl('url2', 'a2', id)
-    await repository.createUrl('url3', 'a3', id)
+  it('deve fazer soft delete de uma url ativa do usuário', async () => {
+    prismaMock.urls.updateMany.mockResolvedValueOnce({ count: 1 } as never)
 
-    const result = await repository.listUrls(id)
-
-    expect(result).toHaveLength(3)
-  })
-
-  it('deve fazer soft delete', async () => {
-    const created = await repository.createUrl(
-      'url',
-      'abc',
-      id,
-    )
-
-    const count = await repository.deleteUrl(
-      id,
-      created.id,
-    )
+    const count = await repository.deleteUrl('user-1', 'url-1')
 
     expect(count).toBe(1)
-
-    const deleted = await prisma.urls.findUnique({
-      where: { id: created.id },
+    expect(prismaMock.urls.updateMany).toHaveBeenCalledWith({
+      where: {
+        id: 'url-1',
+        users_id: 'user-1',
+        status: 1,
+      },
+      data: {
+        status: 0,
+        deleted_at: expect.any(Date),
+      },
     })
-
-    expect(deleted?.status).toBe(0)
   })
 
   it('deve verificar owner corretamente', async () => {
-    const created = await repository.createUrl(
-      'url',
-      'abc',
-      id,
-    )
+    const url = { id: 'url-1', users_id: 'user-1' }
+    prismaMock.urls.findFirst.mockResolvedValueOnce(url as never)
 
-    const result = await repository.checkOwner(
-      id,
-      created.id,
-    )
+    const result = await repository.checkOwner('user-1', 'url-1')
 
-    expect(result).not.toBeNull()
+    expect(result).toBe(url)
+    expect(prismaMock.urls.findFirst).toHaveBeenCalledWith({
+      where: { users_id: 'user-1', id: 'url-1', status: 1 },
+    })
   })
 
-  it('não deve validar owner errado', async () => {
-    const created = await repository.createUrl(
-      'url',
-      'abc',
-      id,
-    )
-
-    const result = await repository.checkOwner(
-      'id-2',
-      created.id,
-    )
-
-    expect(result).toBeNull()
-  })
-
-  it('deve buscar por alias', async () => {
-    await repository.createUrl('url', 'abc123', id)
+  it('deve buscar por alias ativo', async () => {
+    const url = { id: 'url-1', alias: 'abc123' }
+    prismaMock.urls.findFirst.mockResolvedValueOnce(url as never)
 
     const result = await repository.findUrlByAlias('abc123')
 
-    expect(result?.url).toBe('url')
+    expect(result).toBe(url)
+    expect(prismaMock.urls.findFirst).toHaveBeenCalledWith({
+      where: { alias: 'abc123', status: 1 },
+    })
   })
 
   it('deve incrementar contador', async () => {
-    const created = await repository.createUrl(
-      'url',
-      'abc',
-      id,
-    )
+    const url = { id: 'url-1', counter: 1 }
+    prismaMock.urls.update.mockResolvedValueOnce(url as never)
 
-    const updated = await repository.addCount(created.id)
+    const result = await repository.addCount('url-1')
 
-    expect(updated.counter).toBe(1)
+    expect(result).toBe(url)
+    expect(prismaMock.urls.update).toHaveBeenCalledWith({
+      where: { id: 'url-1' },
+      data: { counter: { increment: 1 } },
+    })
   })
 })

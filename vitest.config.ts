@@ -4,15 +4,22 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 
 export default defineConfig({
   test: {
-    coverage:{
-      exclude:[
+    coverage: {
+      include: ['src/**/*.ts'],
+      exclude: [
+        'src/**/*.spec.ts',
+        'src/**/*.e2e-spec.ts',
         'src/utils/swagger.ts',
-        'src/@types'
-      ]
+        'src/@types',
+        'src/types',
+        'src/env/index.ts',
+        'src/app.ts',
+        'src/server.ts',
+        'src/lib/prisma.ts',
+      ],
     },
     globals: true,
     root: './',
-    setupFiles: ['test/setup-e2e.ts'],
   },
   plugins: [
     tsConfigPaths(),

@@ -2,22 +2,22 @@
 
 import { randomUUID } from 'node:crypto'
 import { IUrlsRepository } from '@/types/repsoitory'
-import { Urls, Prisma } from '@prisma/client'
+import { Urls } from '@prisma/client'
 
 export class InMemoryUrlsRepository implements IUrlsRepository {
   public items: Urls[] = []
 
-  async createUrl(url:string, alias:string,users_id: string): Promise<Urls> {
+  async createUrl(url: string, alias: string, users_id?: string): Promise<Urls> {
     const newUrl: Urls = {
-        id: String(randomUUID),
-        url,
-        alias,
-        status: 1,
-        counter: 0,
-        created_at: new Date(),
-        deleted_at: null,
-        updated_at: null,
-        users_id
+      id: randomUUID(),
+      url,
+      alias,
+      status: 1,
+      counter: 0,
+      created_at: new Date(),
+      deleted_at: null,
+      updated_at: null,
+      users_id: users_id ?? null,
     }
 
     this.items.push(newUrl)

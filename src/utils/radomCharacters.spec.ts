@@ -5,7 +5,7 @@ describe('Url alias test', () => {
   it('Deve ser possivel gerar caracteres aleatorios', () => {
     const firsSix = generateSixRandomCharacters()
     const anotherSix = generateSixRandomCharacters()
-    console.log(firsSix)
+
     expect(firsSix).not.toBe(anotherSix)
   })
 

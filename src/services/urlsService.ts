@@ -1,19 +1,11 @@
 import { env } from '@/env'
-import { UrlNotFind, UrlsNotFound, YouAreNotTheOwner } from '@/erros/urlsErros'
+import { UrlNotFind, UrlsNotFound } from '@/erros/urlsErros'
 import { IUrlsRepository } from '@/types/repsoitory'
 import { generateSixRandomCharacters } from '@/utils/randomCharacters'
 import { Urls } from '@prisma/client'
 
 export class UrlsServices {
   constructor(private urlsRepository: IUrlsRepository) {}
-
-  private async checkOwner(user_id: string, url_id: string) {
-    const check = await this.urlsRepository.checkOwner(user_id, url_id)
-
-    if (!check) {
-      throw new YouAreNotTheOwner()
-    }
-  }
 
   public async shortenUrlsService(url: string, user_id?: string) {
     let newUrl: Urls

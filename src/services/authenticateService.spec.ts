@@ -34,7 +34,7 @@ describe('Auth User Service', () => {
       password_hash: await hash('123456', 4),
     })
 
-    expect(
+    await expect(
       async () =>
         await sut.execute({
           email: 'gustavo@howtmail.com',
@@ -50,7 +50,7 @@ describe('Auth User Service', () => {
       password_hash: await hash('123456', 4),
     })
 
-    expect(
+    await expect(
       async () =>
         await sut.execute({
           email: 'gustavo@hotmail.com',

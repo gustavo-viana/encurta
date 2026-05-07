@@ -33,7 +33,7 @@ export async function verifyAlias(
 ) {
   const createSchema = z.string().regex(/^\d{6}$/)
 
-  createSchema.safeParse(request.params.alias)
+  createSchema.parse(request.params.alias)
 }
 
 export async function verifyDataToUpdateUrl(

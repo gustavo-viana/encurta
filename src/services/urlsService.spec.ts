@@ -31,9 +31,8 @@ describe('UrlsServices', () => {
 
   it('deve criar url sem usuário', async () => {
     const result = await sut.shortenUrlsService('http://google.com')
-    console.log(">>>>>>>>>>>>>>", result)
 
-    expect(result).include("http://short.ly/")
+    expect(result).include('http://short.ly/')
   })
 
   it('deve buscar url e incrementar contador', async () => {

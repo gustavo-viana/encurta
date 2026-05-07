@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest'
 import { app } from '@/app'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
@@ -11,6 +11,11 @@ describe('Authenticate Controller (E2E)', () => {
 
   afterAll(async () => {
     await app.close()
+  })
+
+  beforeEach(async () => {
+    await prisma.urls.deleteMany()
+    await prisma.users.deleteMany()
   })
 
   it('deve autenticar com credenciais válidas', async () => {
@@ -47,7 +52,7 @@ describe('Authenticate Controller (E2E)', () => {
     })
 
     const response = await request(app.server)
-      .post('/sessions')
+      .post('/users/sessions')
       .send({
         email: 'wrong@email.com',
         password: 'senha_errada',

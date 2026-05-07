@@ -1,14 +1,19 @@
-
 import { config } from 'dotenv'
 
 import { PrismaClient } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { execSync } from 'node:child_process'
-import { envSchema } from '@/env/'
+import { z } from 'zod'
 
+config({ path: '.env.test', override: true })
+
+const envSchema = z.object({
+  DATABASE_URL: z.string(),
+})
 const env = envSchema.parse(process.env)
 
-let prisma: PrismaClient
+let prisma: PrismaClient | undefined
+let schemaCreated = false
 
 function generateUniqueDatabaseURL(schemaId: string) {
   if (!env.DATABASE_URL) {
@@ -31,10 +36,21 @@ beforeAll(async () => {
 
   prisma = new PrismaClient()
 
-  execSync('npx prisma db push')
+  execSync('npx prisma db push', {
+    env: {
+      ...process.env,
+      DATABASE_URL: databaseURL,
+    },
+  })
+  schemaCreated = true
 })
 
 afterAll(async () => {
+  if (!prisma || !schemaCreated) {
+    await prisma?.$disconnect()
+    return
+  }
+
   await prisma.$executeRawUnsafe(`DROP SCHEMA IF EXISTS "${schemaId}" CASCADE`)
   await prisma.$disconnect()
 })
