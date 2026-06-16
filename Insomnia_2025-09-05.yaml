@@ -6,7 +6,7 @@ meta:
   modified: 1757074214454
   description: ""
 collection:
-  - name: Desafio Teddy
+  - name: Encurtador de Urls
     meta:
       id: fld_55d39db7562048ae804c93ddc91e084b
       created: 1757095099483
@@ -87,7 +87,7 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.url }}/urls/busca-urls"
+      - url: "{{ _.url }}/urls/search-url"
         name: Busca URL
         meta:
           id: req_fad36c5cccf14f7d8c837c248cc60db4
@@ -241,7 +241,7 @@ cookieJar:
     created: 1757074244995
     modified: 1757074244995
 environments:
-  name: Teddy
+  name: Encurta
   meta:
     id: env_99d30891da4bdcebc63947a8fc17f076de878684
     created: 1757074244994

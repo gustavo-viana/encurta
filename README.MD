@@ -1,4 +1,4 @@
-# 🔗 Encurtador de URLs - Teddy
+# 🔗 Encurtador de URLs
 
 Sistema de encurtamento de URLs desenvolvido com Node.js, Fastify, TypeScript e PostgreSQL.
 
@@ -15,7 +15,7 @@ Sistema de encurtamento de URLs desenvolvido com Node.js, Fastify, TypeScript e 
 
 ## 🛠️ Tecnologias
 
-- **Backend**: Node.js 22.19.0, Fastify, TypeScript
+- **Backend**: Node.js 22.22.1, Fastify, TypeScript
 - **Banco de Dados**: PostgreSQL 15
 - **ORM**: Prisma
 - **Autenticação**: JWT
@@ -27,7 +27,7 @@ Sistema de encurtamento de URLs desenvolvido com Node.js, Fastify, TypeScript e 
 ### 📋 Pré-requisitos
 
 **Para todos os sistemas:**
-- Node.js 22.19.0
+- Node.js 22.22.1
 - PostgreSQL (para execução local)
 - Docker e Docker Compose (para execução automatizada)
 - Git
@@ -64,7 +64,7 @@ docker-compose down
 4. **Para rodar local**
 - Garanta que a verão do node está correta (NODE v22.19.0)
 - Execute o docker-compose que se encontra dentro da pasta docker-local para subir uma versão do banco postgres
-- Execute os scrips no terminal dentro da pasta teddy
+- Execute os scrips no terminal dentro da pasta
 ```bash
 # Para instalar dependencias
 npm i

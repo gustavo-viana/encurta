@@ -3,7 +3,7 @@ import { env } from '../src/env'
 import semver from 'semver'
 import 'dotenv/config'
 
-const allowedVersion = '22.19.0'
+const allowedVersion = '22.22.1'
 const nodeVersion = process.version // ex: 'v20.4.0'
 
 if (!semver.satisfies(nodeVersion, allowedVersion)) {

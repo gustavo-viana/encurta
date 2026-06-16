@@ -20,7 +20,7 @@ export const app = fastify({
 app.register(fastifySwagger, {
   openapi: {
     info: {
-      title: 'Teste Teddy',
+      title: 'Encurtador de links',
       version: '1.0.0',
     },
     components: {

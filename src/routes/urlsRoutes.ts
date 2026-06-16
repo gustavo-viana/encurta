@@ -36,7 +36,7 @@ export default async function urlsRoutes(app: FastifyInstance) {
   )
 
   app.get(
-    '/busca-urls',
+    '/search-url',
     { schema: buscaUrlsSwagger, preHandler: [verifyJWT] },
     listUrlsByUserIdController,
   )

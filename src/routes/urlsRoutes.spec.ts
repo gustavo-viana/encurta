@@ -41,7 +41,7 @@ describe('urlsRoutes', () => {
       createUrlsController,
     )
     expect(app.get).toHaveBeenCalledWith(
-      '/busca-urls',
+      '/search-url',
       expect.objectContaining({
         preHandler: [verifyJWT],
       }),
