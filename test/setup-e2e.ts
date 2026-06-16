@@ -28,12 +28,11 @@ function generateUniqueDatabaseURL(schemaId: string) {
 }
 
 const schemaId = randomUUID()
+const databaseURL = generateUniqueDatabaseURL(schemaId)
+
+process.env.DATABASE_URL = databaseURL
 
 beforeAll(async () => {
-  const databaseURL = generateUniqueDatabaseURL(schemaId)
-
-  process.env.DATABASE_URL = databaseURL
-
   prisma = new PrismaClient()
 
   execSync('npx prisma db push', {
